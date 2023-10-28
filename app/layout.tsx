@@ -4,6 +4,9 @@ import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import SupabaseProvider from "@/providers/SupabaseProvider";
 import UserProvider from "@/providers/UserProvider";
+import ModelProvider from "@/providers/ModalProvider";
+import ToasterProvider from "@/providers/ToasterProvider";
+import getSongsByUserId from "@/actions/getSongsByUserId";
 
 const inter = Figtree({ subsets: ["latin"] });
 
@@ -12,17 +15,22 @@ export const metadata: Metadata = {
   description: "Spotify home made version",
 };
 
-export default function RootLayout({
+export const revalidate = 0;
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const userSongs = await getSongsByUserId();
   return (
     <html lang="en">
       <body className={inter.className}>
+        <ToasterProvider />
         <SupabaseProvider>
           <UserProvider>
-            <Sidebar>{children}</Sidebar>
+            <ModelProvider />
+            <Sidebar songs={userSongs}>{children}</Sidebar>
           </UserProvider>
         </SupabaseProvider>
       </body>
